@@ -1,3 +1,44 @@
+-- LocalScript (place it in StarterPlayerScripts or StarterGui)
+
+-- Services
+local Players = game:GetService("Players")
+
+-- Function to remove highlights from a character
+local function removeHighlightsFromCharacter(character)
+    -- Find the "Highlight" object in the character
+    local highlight = character:FindFirstChild("Highlight")
+    if highlight then
+        -- Remove the highlight
+        highlight:Destroy()
+    end
+end
+
+-- Function to remove highlights from all players
+local function removeAllHighlights()
+    for _, player in pairs(Players:GetPlayers()) do
+        local character = player.Character
+        if character then
+            -- Remove highlight from player's character
+            removeHighlightsFromCharacter(character)
+        end
+    end
+end
+
+-- Example of calling the function manually or from an event
+removeAllHighlights()
+
+-- Optionally, connect this to an event to run when the player respawns or at another specific time.
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        -- Remove highlight when the character is added
+        removeHighlightsFromCharacter(character)
+    end)
+end)
+
+
+
+
+
 -- LocalScript (umieść go w StarterPlayerScripts lub StarterGui)
 
 -- Usługi
