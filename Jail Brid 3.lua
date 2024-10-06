@@ -2,53 +2,12 @@
 
 -- Services
 local Players = game:GetService("Players")
-
--- Function to remove highlights from a character
-local function removeHighlightsFromCharacter(character)
-    -- Find the "Highlight" object in the character
-    local highlight = character:FindFirstChild("Highlight")
-    if highlight then
-        -- Remove the highlight
-        highlight:Destroy()
-    end
-end
-
--- Function to remove highlights from all players
-local function removeAllHighlights()
-    for _, player in pairs(Players:GetPlayers()) do
-        local character = player.Character
-        if character then
-            -- Remove highlight from player's character
-            removeHighlightsFromCharacter(character)
-        end
-    end
-end
-
--- Example of calling the function manually or from an event
-removeAllHighlights()
-
--- Optionally, connect this to an event to run when the player respawns or at another specific time.
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        -- Remove highlight when the character is added
-        removeHighlightsFromCharacter(character)
-    end)
-end)
-
-
-
-
-
--- LocalScript (umieść go w StarterPlayerScripts lub StarterGui)
-
--- Usługi
-local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Lokalny gracz
+-- Local player
 local localPlayer = Players.LocalPlayer
 
--- Funkcja do sprawdzania, czy gracz żyje
+-- Function to check if the player is alive
 local function isAlive(character)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid and humanoid.Health > 0 then
@@ -57,21 +16,21 @@ local function isAlive(character)
     return false
 end
 
--- Funkcja do dodawania obramowania do postaci
+-- Function to add an outline to a character
 local function addOutline(character, color)
     local highlight = character:FindFirstChild("Highlight")
     
-    -- Jeśli obramowanie już nie istnieje, stworzymy je
+    -- If the highlight doesn't already exist, create it
     if not highlight then
         highlight = Instance.new("Highlight")
         highlight.Parent = character
-        highlight.OutlineColor = color  -- Ustawienie koloru obramówki
-        highlight.OutlineTransparency = 0  -- Pełna widoczność obramówki
-        highlight.FillTransparency = 1  -- Wypełnienie całkowicie przezroczyste
+        highlight.OutlineColor = color  -- Set outline color
+        highlight.OutlineTransparency = 0  -- Full visibility for the outline
+        highlight.FillTransparency = 1  -- Fully transparent fill
     end
 end
 
--- Funkcja do usuwania obramowania z postaci
+-- Function to remove the outline from a character
 local function removeOutline(character)
     local highlight = character:FindFirstChild("Highlight")
     if highlight then
@@ -79,23 +38,26 @@ local function removeOutline(character)
     end
 end
 
--- Funkcja główna do aktualizacji obramówek graczy
+-- Main function to update player outlines
 local function updatePlayerOutlines()
     for _, player in pairs(Players:GetPlayers()) do
-        if player ~= localPlayer then  -- Ignorowanie lokalnego gracza
+        if player ~= localPlayer then  -- Ignore the local player
             local character = player.Character
             if character and isAlive(character) then
-                -- Dodanie czerwonej obramówki, gdy gracz żyje
-                addOutline(character, Color3.new(1, 0, 0))  -- Czerwony kolor
+                -- Add a red outline when the player is alive
+                addOutline(character, Color3.new(1, 0, 0))  -- Red color
             else
-                -- Usunięcie obramówki, gdy gracz jest martwy
+                -- Remove the outline when the player is dead
                 removeOutline(character)
             end
         end
     end
 end
 
--- Uruchamianie funkcji aktualizacji w każdej klatce
-RunService.RenderStepped:Connect(function()
-    updatePlayerOutlines()
+-- Run the update every 2 seconds
+task.spawn(function()
+    while true do
+        updatePlayerOutlines()
+        task.wait(2)  -- Wait for 2 seconds before updating again
+    end
 end)
